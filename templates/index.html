@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <a href="/criarTarefa">criar tarefa</a>
+
+    <table style="text-align: center;">
+        <th>Título</th>
+        <th>Descrição</th>
+        <th>Data</th>
+        <th>Concluída?</th>
+        <th>Opções</th>
+        {% for t in tarefas %}
+            <tr>
+            <td>{{t.titulo}}</td>
+            <td>{{t.descricao}}</td>
+            <td>{{t.data}}</td>
+            <td>{{t.concluida}}</td>
+            <td>
+                <a href="/alterarTarefa?id={{t.id}}">alterar</a>
+                <a href="/excluirTarefa?id={{t.id}}">excluir</a>
+                <a href="/concluirTarefa?id={{t.id}}">concluir</a>
+            </td>
+            </tr>
+        {% endfor%}
+    
+    </table>
+
+{% endblock %}

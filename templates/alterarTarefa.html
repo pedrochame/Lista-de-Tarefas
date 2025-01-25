@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <form method="post" action="">
+
+        <input name="id" type="number" value="{{tarefa.id}}">
+        <input name="titulo" type="text" required value="{{tarefa.titulo}}">
+        <input name="descricao" type="text" value="{{tarefa.descricao}}">
+        <input name="data" type="date" required value="{{tarefa.data}}">
+
+        <button type="submit">Enviar</button>
+
+    </form>
+
+
+{% endblock %}
