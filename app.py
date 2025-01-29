@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 
@@ -11,17 +11,45 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Evitar warnings
 # Inicializar o banco de dados
 db = SQLAlchemy(app)
 
+# Função para alterar data de aaaa-mm-dd para dd/mm/aaaa e vice-versa
+def converteData(dt):
+    if dt[2] == "-":
+        return dt.split("-")[2]+"-"+dt.split("-")[1]+"-"+dt.split("-")[0]
+    return dt.split("/")[2]+"/"+dt.split("/")[1]+"/"+dt.split("/")[0]
+
 # Tabela de tarefas
 class Tarefa(db.Model):
     id        = db.Column(db.Integer, primary_key=True)
     titulo    = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text, nullable=True)
-    data      = db.Column(db.Date, nullable=False)
+    data      = db.Column(db.String(10), nullable=False)
     concluida = db.Column(db.Boolean, default=False)
+
+    def toDict(self):
+        return {"id":self.id,"titulo":self.titulo,"descricao":self.descricao,"data":converteData(self.data),"concluida":self.concluida}
 
 @app.route("/")
 def tarefas():
-    return render_template("index.html",tarefas=Tarefa.query.all())
+    return render_template("index.html")
+
+# Rota para busca de tarefas
+@app.route("/busca")
+def busca():
+    
+    lista = []
+
+    if request.args.get("concluida"):
+        if request.args.get("concluida") == "-1":
+            for tarefa in Tarefa.query.order_by(Tarefa.data):
+                lista.append(tarefa.toDict())
+        else:
+            for tarefa in Tarefa.query.filter_by(concluida = request.args.get("concluida")).order_by(Tarefa.data):
+                lista.append(tarefa.toDict())
+    
+    else:
+        return redirect("/")
+    
+    return jsonify(lista)
 
 @app.route("/criarTarefa",methods=["GET","POST"])
 def criarTarefa():
@@ -30,8 +58,7 @@ def criarTarefa():
 
         t       = request.form.get("titulo")
         desc    = request.form.get("descricao")
-        dt      = request.form.get("data").split("-")
-        dt      = date(int(dt[0]),int(dt[1]),int(dt[2]))
+        dt      = converteData(request.form.get("data"))
 
         tarefa = Tarefa(titulo=t,descricao=desc,data=dt)
         db.session.add(tarefa)
@@ -51,8 +78,7 @@ def alterarTarefa():
         id      = int(request.form.get("id"))
         t       = request.form.get("titulo")
         desc    = request.form.get("descricao")
-        dt      = request.form.get("data").split("-")
-        dt      = date(int(dt[0]),int(dt[1]),int(dt[2]))
+        dt      = converteData(request.form.get("data"))
 
         tarefa = Tarefa.query.get(id)
 
@@ -70,6 +96,7 @@ def alterarTarefa():
         if tarefa == None:
             return redirect("/")
         
+        tarefa.data = converteData(tarefa.data)
         return render_template("alterarTarefa.html",tarefa = tarefa)
     
 @app.route("/excluirTarefa",methods=["GET","POST"])
