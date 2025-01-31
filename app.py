@@ -30,21 +30,32 @@ class Tarefa(db.Model):
 
 @app.route("/")
 def tarefas():
-    return render_template("index.html")
+
+    filtro = request.args.get("filtro")
+    if filtro==None or (int(filtro) not in [-1,0,1]):
+        filtro="-1"
+        
+    return render_template("index.html",filtro=filtro)
 
 # Rota para busca de tarefas
 @app.route("/busca")
 def busca():
+
+    filtro = request.args.get("filtro")
+
+    if int(filtro) not in [-1,0,1]:
+        return redirect("/")
     
     lista = []
 
-    if request.args.get("concluida"):
-        if request.args.get("concluida") == "-1":
-            for tarefa in Tarefa.query.order_by(Tarefa.data):
-                lista.append(tarefa.toDict())
+    if filtro:
+        if filtro == "-1":
+            tarefas = Tarefa.query.order_by(Tarefa.data)
         else:
-            for tarefa in Tarefa.query.filter_by(concluida = request.args.get("concluida")).order_by(Tarefa.data):
-                lista.append(tarefa.toDict())
+            tarefas = Tarefa.query.filter_by(concluida = filtro).order_by(Tarefa.data)
+
+        for tarefa in tarefas:
+            lista.append(tarefa.toDict())
     
     else:
         return redirect("/")
@@ -117,7 +128,7 @@ def concluirTarefa():
         return redirect("/")
     tarefa.concluida = True
     db.session.commit()
-    return redirect("/")
+    return redirect("/?filtro="+request.args.get("filtro"))
 
 # Ao executar o aplicativo, o banco de dados é criado, se já não existir
 if __name__ == '__main__':

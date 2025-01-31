@@ -5,19 +5,22 @@
     <div class="container mt-3 mb-3">
         <div class="col-12 d-flex">
             <div class="col-6 text-center">
-                <a class="btn btn-primary" href="/criarTarefa">NOVA TAREFA</a>
+                <a class="btn btn-primary" href="/criarTarefa"><b>CADASTRAR NOVA TAREFA</b></a>
             </div>
             <div class="col-6 text-center">
-                <select style="height: 100%;" type="text" id="estado">
-                    <option type="text" selected value="-1">TODAS</option>
-                    <option type="text" value="1">CONCLUÍDAS</option>
-                    <option type="text" value="0">NÃO CONCLUÍDAS</option>
+                <select class="form-select text-center" type="text" id="filtro">
+                        {% for i in {"-1":"TODAS AS TAREFAS" , "0": "TAREFAS NÃO CONCLUÍDAS" , "1": "TAREFAS CONCLUÍDAS" }.items() %}
+                            {% if filtro == i[0] %}
+                                <option type="text" selected value="{{i[0]}}">{{i[1]}}</option>
+                            {% else %}
+                                <option type="text" value="{{i[0]}}">{{i[1]}}</option>
+                            {% endif %}
+                        {% endfor %}
                 </select>
             </div>
         </div>
     </div>
 
-    <table class="table text-center" id="tabelaTarefas">
-    </table>
+    <table class="table text-center" id="tabelaTarefas"></table>
 
 {% endblock %}

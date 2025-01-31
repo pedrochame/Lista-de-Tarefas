@@ -2,15 +2,29 @@
 
 {% block body %}
 
-    <form method="post" action="">
+    <div class="container mt-3">
+        <div class="col-lg-4 col-md-8 col-sm-12 text-center mx-auto">
 
-        <input name="id" type="number" value="{{tarefa.id}}" hidden>
-        <input name="titulo" type="text" required value="{{tarefa.titulo}}">
-        <input name="descricao" type="text" value="{{tarefa.descricao}}">
-        <input name="data" type="text" required value="{{tarefa.data}}">
-        <button type="submit">Enviar</button>
+            <form method="post" action="">
 
-    </form>
+                <input name="id" type="number" value="{{tarefa.id}}" hidden>
 
+                <div class="mb-3">
+                    <label for="titulo" class="form-label"><b>Título</b></label>
+                    <input value="{{tarefa.titulo}}" class="form-control" name="titulo" type="text" required>
+                </div>
+                <div class="mb-3">
+                    <label for="data" class="form-label"><b>Data</b></label>
+                    <input value="{{tarefa.data}}" class="form-control" name="data" type="text" required>
+                </div>
+                <div class="mb-3">
+                    <label for="descricao" class="form-label"><b>Descrição</b></label>
+                    <textarea rows="3" class="form-control" name="descricao" type="textarea" required>{{tarefa.descricao}}</textarea>
+                </div>
+                <button class="btn btn-primary" type="submit"><b>ENVIAR</b></button>
+            </form>
+
+        </div>
+    </div>
 
 {% endblock %}
