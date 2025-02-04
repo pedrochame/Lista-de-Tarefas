@@ -118,7 +118,7 @@ def excluirTarefa():
         return redirect("/")
     db.session.delete(tarefa)
     db.session.commit()
-    return redirect("/")
+    return redirect("/?filtro="+request.args.get("filtro"))
 
 @app.route("/concluirTarefa",methods=["GET","POST"])
 def concluirTarefa():

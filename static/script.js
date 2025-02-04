@@ -34,11 +34,11 @@ if(window.location.pathname == "/"){
                     html+="<td>Não</td>";
                 }
                 
-                html+="<td>";
-                html += "<a href='/alterarTarefa?id="+t.id+"'><img src='static/icones/editar.png'></a>";
-                html += "<a href='/excluirTarefa?id="+t.id+"'><img src='static/icones/cruz.png'></a>";
-                html += "<a href='/concluirTarefa?filtro="+filtro+"&id="+t.id+"'><img src='static/icones/verificar.png'></a>";
-                html += "</td></tr>";
+                html+="<td><div class='col-12 d-flex'>";
+                html += "<div class='col-4'><a href='/alterarTarefa?id="+t.id+"'><img id='iconeEditar' class='img-fluid' src='static/icones/editar.png'></a></div>";
+                html += "<div class='col-4'><a href='/excluirTarefa?filtro="+filtro+"&id="+t.id+"'><img id='iconeApagar' class='img-fluid' src='static/icones/apagar.png'></a></div>";
+                html += "<div class='col-4'><a href='/concluirTarefa?filtro="+filtro+"&id="+t.id+"'><img id='iconeConcluir' class='img-fluid' src='static/icones/concluir.png'></a></div>";
+                html += "</div></td></tr>";
             
             });
 
