@@ -35,18 +35,38 @@ if(window.location.pathname == "/"){
                 }
                 
                 html+="<td><div class='col-12 d-flex'>";
-                html += "<div class='col-4'><a href='/alterarTarefa?id="+t.id+"'><img id='iconeEditar' class='img-fluid' src='static/icones/editar.png'></a></div>";
-                html += "<div class='col-4'><a href='/excluirTarefa?filtro="+filtro+"&id="+t.id+"'><img id='iconeApagar' class='img-fluid' src='static/icones/apagar.png'></a></div>";
-                html += "<div class='col-4'><a href='/concluirTarefa?filtro="+filtro+"&id="+t.id+"'><img id='iconeConcluir' class='img-fluid' src='static/icones/concluir.png'></a></div>";
+                html += "<div class='col-4'><a href='/alterarTarefa?id="+t.id+"'><img class='icone img-fluid' src='static/icones/editar.png'></a></div>";
+                html += "<div class='col-4'><a href='/excluirTarefa?filtro="+filtro+"&id="+t.id+"'><img class='icone img-fluid' src='static/icones/apagar.png'></a></div>";
+                html += "<div class='col-4'><a href='/concluirTarefa?filtro="+filtro+"&id="+t.id+"'><img class='icone img-fluid' src='static/icones/concluir.png'></a></div>";
                 html += "</div></td></tr>";
             
             });
 
             tabelaTarefas.innerHTML=html;
 
+            //Personalizando os ícones de ação cada vez que a exibição dos registros é atualizada
+            personalizaIcones();
+
         } catch (error) {
             console.error("Erro ao consultar a API:", error);
             tabelaTarefas.innerHTML = "Erro ao carregar os dados.";
+        }
+    }
+
+    function personalizaIcones(){
+
+        //Ao passar o mouse sobre os ícones, os mesmos são alterados para a versão colorida
+        let icones = document.querySelectorAll(".icone");
+        if (icones) {
+            icones.forEach(icone => {
+                let nome = icone.src.split("/")[icone.src.split("/").length-1];
+                icone.addEventListener("mouseover", function () {
+                    icone.src = "static/icones/cor-"+nome;
+                });
+                icone.addEventListener("mouseout", function () {
+                    icone.src = "static/icones/"+nome.replace("cor-","");
+                });
+            });
         }
     }
 }
