@@ -1,0 +1,10 @@
+body {
+    background-image: url("imagens/wallpaper.jpg");
+    background-repeat: repeat;
+}
+
+#tabelaTarefas{
+    th,td{
+        background-color: transparent;
+    }
+}

@@ -1,3 +1,60 @@
+//Código JS para as Páginas de Criação e Edição de Tarefa
+if(["/criarTarefa","/alterarTarefa"].includes(window.location.pathname)){
+    
+    //Colocando máscara no campo DATA
+    defineMascaraData();
+
+    ///// [EM PROCESSO] Se todos os campos não estiverem preenchidos corretamente, o botão de enviar fica bloqueado
+    let btEnviar = document.querySelector(".btn");
+    let campos = document.querySelectorAll(".form-control");
+    
+    btEnviar.addEventListener("mouseover",function(){
+        let camposPreenchidos = 0;
+        if(campos){
+            campos.forEach(campo => {
+                if(campo.value.length != 0){
+                    camposPreenchidos++;
+                }
+            });
+        }
+
+        console.log(camposPreenchidos);
+        console.log(campos.length);
+
+        if(camposPreenchidos == campos.length){
+            btEnviar.disabled = false;
+        }else{
+            btEnviar.disabled = true;
+        }
+    });
+    /////
+}
+
+function defineMascaraData(){
+    let data = document.querySelector("#data");
+    if(data){
+        data.addEventListener("input", function(e){
+
+            //Se o caractere digitado no campo for o 11° ou não for um número, o mesmo é retirado
+
+            // 0 -> 48 em ASCII | 9 -> 57 em ASCII
+            let x = e.target.value.split("").pop();
+            if((this.value.length == 11) || !(x.charCodeAt(0) >= 48 && x.charCodeAt(0) <= 57)){
+                let v = this.value.split("");
+                v.pop();
+                this.value = v.join("");
+            }
+
+            //Se for o 3° dígito, coloca-se a barra de separação dia-mês
+            //Se for o 5° dígito, coloca-se a barra de separação mês-ano
+            if(this.value.length == 2 || this.value.length == 5){
+                this.value += "/";
+            }
+
+        });
+    }
+}
+
 // Código JS para a Página Inicial
 if(window.location.pathname == "/"){
 
@@ -22,22 +79,50 @@ if(window.location.pathname == "/"){
             const response = await fetch("/busca?filtro="+filtro); // Faz a requisição
             const tarefas = await response.json(); // Converte a resposta para JSON
 
-            html="<th>TÍTULO</th><th>DESCRIÇÃO</th><th>DATA</th><th>CONCLUÍDA?</th><th>AÇÕES</th>"
+            html="<th>TÍTULO</th><th>DESCRIÇÃO</th><th>DATA</th><th>CONCLUÍDA?</th><th>AÇÕES</th>";
 
             tarefas.forEach(t => {
 
-                html+="<tr><td>"+t.titulo+"</td><td>"+t.descricao+"</td><td>"+t.data;+"</td>";
+
+                //Se a tarefa já foi concluída, sua linha é verde. Se não, é vermelha.
+                let corTarefa;
+                if(t.concluida){
+                    corTarefa = "style='background-color:rgba(0,255,0,0.15);'";
+                }else{
+                    corTarefa = "style='background-color:rgba(255,0,0,0.15);'";
+                }
+
+
+
+
+                html+="<tr><td "+corTarefa+">"+t.titulo+"</td><td "+corTarefa+">"+t.descricao+"</td><td "+corTarefa+">"+t.data;+"</td>";
                 
                 if(t.concluida){
-                    html+="<td>Sim</td>";
+                    html+="<td "+corTarefa+">Sim</td>";
                 }else{
-                    html+="<td>Não</td>";
+                    html+="<td "+corTarefa+">Não</td>";
                 }
-                
-                html+="<td><div class='col-12 d-flex'>";
-                html += "<div class='col-4'><a href='/alterarTarefa?id="+t.id+"'><img class='icone img-fluid' src='static/icones/editar.png'></a></div>";
+
+
+                html+="<td "+corTarefa+"><div class='col-12 d-flex'>";
+
+                //Os ícones de ação de EDITAR e CONCLUIR só são exibidos se a tarefa ainda não tiver sido concluída
+                let mostraIcones;
+                if(t.concluida){
+                    mostraIcones = "style='display:none;'";
+                }else{
+                    mostraIcones = "style='display:inline;'";
+                }
+
+
+                html += "<div class='col-4'><a "+mostraIcones+" href='/concluirTarefa?filtro="+filtro+"&id="+t.id+"'><img class='icone img-fluid' src='static/icones/concluir.png'></a></div>";
+
+
                 html += "<div class='col-4'><a href='/excluirTarefa?filtro="+filtro+"&id="+t.id+"'><img class='icone img-fluid' src='static/icones/apagar.png'></a></div>";
-                html += "<div class='col-4'><a href='/concluirTarefa?filtro="+filtro+"&id="+t.id+"'><img class='icone img-fluid' src='static/icones/concluir.png'></a></div>";
+
+
+                html += "<div class='col-4'><a "+mostraIcones+"href='/alterarTarefa?id="+t.id+"'><img class='icone img-fluid' src='static/icones/editar.png'></a></div>";
+                
                 html += "</div></td></tr>";
             
             });
@@ -69,4 +154,5 @@ if(window.location.pathname == "/"){
             });
         }
     }
+
 }
