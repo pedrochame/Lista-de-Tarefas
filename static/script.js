@@ -1,6 +1,6 @@
 //Código JS para as Páginas de Criação e Edição de Tarefa
 if(["/criarTarefa","/alterarTarefa"].includes(window.location.pathname)){
-    
+
     //Colocando máscara no campo DATA
     defineMascaraData();
 
@@ -23,6 +23,8 @@ if(["/criarTarefa","/alterarTarefa"].includes(window.location.pathname)){
     }
 
 }
+
+//Códigos auxiliares
 
 function personalizaCampoData(){
     let data = document.querySelector("#data");
@@ -53,6 +55,10 @@ function verificaData(){
             return false;
         }
 
+        if(data.value.split("")[2] != "/" || data.value.split("")[5] != "/"){
+            return false;
+        }
+
         if(data.value.split("/")[0]>31 || data.value.split("/")[1]>12){
             return false;
         }
@@ -79,34 +85,33 @@ function retornaMesStr(mes){
 }
 
 
-/////////////// [REVISAR]
+//Definindo máscara para o campo DATA
 
 function defineMascaraData(){
     let data = document.querySelector("#data");
     if(data){
-        data.addEventListener("input", function(e){
 
-            //Se o caractere digitado no campo for o 11° ou não for um número, o mesmo é retirado
+        data.addEventListener("keypress", function(e){
 
-            // 0 -> 48 em ASCII | 9 -> 57 em ASCII
-            let x = e.target.value.split("").pop();
-            if((this.value.length == 11) || !(x.charCodeAt(0) >= 48 && x.charCodeAt(0) <= 57)){
-                let v = this.value.split("");
-                v.pop();
-                this.value = v.join("");
-            }
+            if( (this.value.length == 10 || (e.key < "0" || e.key > "9")) ){
+                e.preventDefault();    
+            }else{
 
-            //Se for o 3° dígito, coloca-se a barra de separação dia-mês
-            //Se for o 5° dígito, coloca-se a barra de separação mês-ano
-            if(this.value.length == 2 || this.value.length == 5){
-                this.value += "/";
+                this.value += e.key;
+                e.preventDefault();
+                
+                if(this.value.length == 2 || this.value.length == 5){
+                    this.value += "/";
+                }
+
             }
 
         });
+
     }
 }
 
-///////////////
+//
 
 // Código JS para a Página Inicial
 if(window.location.pathname == "/"){

@@ -11,16 +11,17 @@
 
                 <div class="mb-3">
                     <label for="titulo" class="form-label"><b>Título</b></label>
-                    <input value="{{tarefa.titulo}}" class="form-control" name="titulo" type="text" required>
+                    <input value="{{tarefa.titulo}}" class="form-control" name="titulo" type="text" required onpaste=event.preventDefault()>
                 </div>
                 <div class="mb-3">
                     <label for="data" class="form-label"><b>Data</b></label>
-                    <input id="data" value="{{tarefa.data}}" class="form-control" name="data" type="text" required>
+                    <input id="data" value="{{tarefa.data}}" class="form-control" name="data" type="text" required onpaste=event.preventDefault()>
                     <i id="msgData">A data da tarefa deve ser válida e posterior à atual!</i>
                 </div>
                 <div class="mb-3">
                     <label for="descricao" class="form-label"><b>Descrição</b></label>
-                    <textarea rows="3" class="form-control" name="descricao" type="textarea" required>{{tarefa.descricao}}</textarea>
+                    <textarea rows="3" class="form-control" name="descricao" type="textarea" 
+                    required onpaste=event.preventDefault()>{{tarefa.descricao}}</textarea>
                 </div>
                 <button class="btn btn-primary" type="submit"><b>ENVIAR</b></button>
             </form>
