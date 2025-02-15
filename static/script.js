@@ -4,31 +4,82 @@ if(["/criarTarefa","/alterarTarefa"].includes(window.location.pathname)){
     //Colocando máscara no campo DATA
     defineMascaraData();
 
-    ///// [EM PROCESSO] Se todos os campos não estiverem preenchidos corretamente, o botão de enviar fica bloqueado
-    let btEnviar = document.querySelector(".btn");
-    let campos = document.querySelectorAll(".form-control");
-    
-    btEnviar.addEventListener("mouseover",function(){
-        let camposPreenchidos = 0;
-        if(campos){
-            campos.forEach(campo => {
-                if(campo.value.length != 0){
-                    camposPreenchidos++;
-                }
-            });
-        }
+    //Deixando a cor do texto no campo DATA em preto quando focado
+    personalizaCampoData();
 
-        console.log(camposPreenchidos);
-        console.log(campos.length);
+    //Ao enviar o formulario, é verificado se o campo DATA está preenchido corretamente
+    let form = document.querySelector("#formulario");
+    if(form){
+        form.addEventListener("submit", function(event){
 
-        if(camposPreenchidos == campos.length){
-            btEnviar.disabled = false;
-        }else{
-            btEnviar.disabled = true;
-        }
-    });
-    /////
+            //Se a data preenchida não é válida ou é posterior à data atual, o envio não acontece
+            if(verificaData() == false){
+                personalizaCampoDataErro(true);
+                //Interrompendo comportamento padrão do evento
+                event.preventDefault();
+            }
+
+        });
+    }
+
 }
+
+function personalizaCampoData(){
+    let data = document.querySelector("#data");
+    if(data){
+        data.addEventListener("focus",function(){
+            personalizaCampoDataErro(false);
+        });
+    }
+}
+
+function personalizaCampoDataErro(erro=false){
+    let data = document.querySelector("#data");
+    if(data){
+        if(erro){
+            document.querySelector("#msgData").style.display = "block";
+            data.style.color = "red";
+        }else{
+            document.querySelector("#msgData").style.display = "none";
+            data.style.color = "black";
+        }
+    }
+}
+
+function verificaData(){
+    let data = document.querySelector("#data");
+    if(data){
+        if(data.value.length!=10){
+            return false;
+        }
+
+        if(data.value.split("/")[0]>31 || data.value.split("/")[1]>12){
+            return false;
+        }
+
+        let dataTarefa = data.value.split("/")[2]+"-"+data.value.split("/")[1]+"-"+data.value.split("/")[0];
+        let hoje = new Date();
+        let dataAtual = hoje.getFullYear()+"-"+retornaMesStr(hoje.getMonth())+"-"+hoje.getDate();
+
+        if(dataTarefa < dataAtual){
+            return false;
+        }
+
+    }else{
+        return false;
+    }
+    return true;
+}
+
+function retornaMesStr(mes){
+    if(mes<10){
+        return "0"+(mes+1);
+    }
+    return (mes+1);
+}
+
+
+/////////////// [REVISAR]
 
 function defineMascaraData(){
     let data = document.querySelector("#data");
@@ -54,6 +105,8 @@ function defineMascaraData(){
         });
     }
 }
+
+///////////////
 
 // Código JS para a Página Inicial
 if(window.location.pathname == "/"){

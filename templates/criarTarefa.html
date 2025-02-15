@@ -5,7 +5,7 @@
     <div class="container mt-3">
         <div class="col-lg-4 col-md-8 col-sm-12 text-center mx-auto">
 
-            <form method="post" action="">
+            <form id="formulario" method="post" action="">
                 <div class="mb-3">
                     <label for="titulo" class="form-label"><b>Título</b></label>
                     <input class="form-control" name="titulo" type="text" required>
@@ -13,6 +13,7 @@
                 <div class="mb-3">
                     <label for="data" class="form-label"><b>Data</b></label>
                     <input id="data" class="form-control" name="data" type="text" required>
+                    <i id="msgData">A data da tarefa deve válida e posterior à atual!</i>
                 </div>
                 <div class="mb-3">
                     <label for="descricao" class="form-label"><b>Descrição</b></label>
