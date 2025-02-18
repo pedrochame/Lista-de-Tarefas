@@ -1,7 +1,7 @@
 from flask import Flask
-from routes.tarefa_routes import tarefa_bp
+from routes import tarefa_bp
 from config import Config
-from extensions.database import db
+from extensions import db
 
 app = Flask(__name__)
 

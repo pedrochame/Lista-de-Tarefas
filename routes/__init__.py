@@ -1,0 +1,1 @@
+from .tarefa_routes import tarefa_bp

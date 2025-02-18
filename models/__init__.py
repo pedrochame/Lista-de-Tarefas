@@ -1,0 +1,1 @@
+from .tarefa import Tarefa

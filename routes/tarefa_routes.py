@@ -1,7 +1,7 @@
-from models.tarefa import Tarefa
+from models import Tarefa
 from flask import Blueprint,render_template, request, redirect, jsonify
-from utils.formatters import converteData
-from extensions.database import db
+from utils import converteData
+from extensions import db
 
 tarefa_bp = Blueprint("tarefa_bp",__name__)
 
@@ -46,9 +46,9 @@ def criarTarefa():
 
         t       = request.form.get("titulo")
         desc    = request.form.get("descricao")
-        dt      = converteData(request.form.get("data"))
+        dt      = request.form.get("data")
 
-        tarefa = Tarefa(titulo=t,descricao=desc,data=dt)
+        tarefa = Tarefa(t,desc,dt)
         db.session.add(tarefa)
         db.session.commit()
         
@@ -66,14 +66,15 @@ def alterarTarefa():
         id      = int(request.form.get("id"))
         t       = request.form.get("titulo")
         desc    = request.form.get("descricao")
-        dt      = converteData(request.form.get("data"))
+        dt      = request.form.get("data")
 
         tarefa = Tarefa.query.get(id)
 
         if tarefa == None:
             return redirect("/")
 
-        tarefa.titulo, tarefa.descricao, tarefa.data = t, desc, dt
+        tarefa.update(t,desc,dt)
+        
         db.session.commit()
         
         return redirect("/")
@@ -84,7 +85,7 @@ def alterarTarefa():
         if tarefa == None:
             return redirect("/")
         
-        tarefa.data = converteData(tarefa.data)
+        #tarefa.data = converteData(tarefa.data)
         return render_template("alterarTarefa.html",tarefa = tarefa)
     
 @tarefa_bp.route("/excluirTarefa",methods=["GET","POST"])
