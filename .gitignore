@@ -1,3 +1,21 @@
+# Ambiente virtual
+venv/
+.env
+
+# Arquivos de cache e compilação
 __pycache__/
-instance/
-static/imagens/wallpaper1.jpg
+*.pyc
+*.pyo
+
+# Configurações de IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Banco de dados SQLite (se estiver usando)
+*.sqlite3
+*.db
+
+# Logs
+logs/
+*.log

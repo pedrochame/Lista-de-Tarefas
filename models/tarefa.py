@@ -1,6 +1,5 @@
 from extensions import db
 from datetime import datetime
-from utils import converteData
 
 # Tabela de tarefas
 class Tarefa(db.Model):
@@ -10,21 +9,47 @@ class Tarefa(db.Model):
     data      = db.Column(db.Date, nullable=False)
     concluida = db.Column(db.Boolean, default=False)
 
-    def __init__(self, titulo, descricao, data, concluida=False):
+    def __init__(self, titulo, descricao, data):
+
+        # Se o título tiver mais de 100 caracteres, uma exceção é lançada
+        if len(str(titulo))>100:
+            raise Exception
+        
         self.titulo = str(titulo)
         self.descricao = str(descricao)
-        self.data = datetime.strptime(data,"%Y-%m-%d").date()
-        self.concluida = bool(concluida)
+
+
+        # Se a data não estiver no formato que o método de conversão para tipo Date espera, uma exceção é lançada
+        try:
+            self.data = datetime.strptime(data,"%Y-%m-%d").date()
+        except:
+            raise Exception
+
+        self.concluida = False
     
     def update(self, titulo, descricao, data):
+        # Se o título tiver mais de 100 caracteres, uma exceção é lançada
+        if len(str(titulo))>100:
+            raise Exception
+        
         self.titulo = str(titulo)
         self.descricao = str(descricao)
-        self.data = datetime.strptime(data,"%Y-%m-%d").date()
+
+
+        # Se a data não estiver no formato que o método de conversão para tipo Date espera, uma exceção é lançada
+        try:
+            self.data = datetime.strptime(data,"%Y-%m-%d").date()
+        except:
+            raise Exception
+
+    def update_status(self):
+        self.concluida = True
 
 
     def toDict(self):
         return {
-            "id":self.id,"titulo":self.titulo,
+            "id":self.id,
+            "titulo":self.titulo,
             "descricao":self.descricao,
             "data": self.data.strftime('%d/%m/%Y'),
             "concluida":self.concluida

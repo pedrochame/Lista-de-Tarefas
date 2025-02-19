@@ -1,109 +1,99 @@
 from models import Tarefa
 from flask import Blueprint,render_template, request, redirect, jsonify
-from utils import converteData
 from extensions import db
 
 tarefa_bp = Blueprint("tarefa_bp",__name__)
 
-@tarefa_bp.route("/")
-def tarefas():
+# Rota que pega todas as tarefas no banco de dados, e retorna um json as contendo
+@tarefa_bp.route("/tarefas")
+def get_tarefas():
 
-    filtro = request.args.get("filtro")
-    if filtro==None or (int(filtro) not in [-1,0,1]):
-        filtro="-1"
+    listaTarefas = []
+    tarefas = Tarefa.query.all()
+    
+    for tarefa in tarefas:
+        listaTarefas.append(tarefa.toDict())
+
+    return jsonify(listaTarefas),200
+
+# Rota que pega uma tarefa pelo id no banco de dados, e retorna ela em formato json
+@tarefa_bp.route("/tarefas/<int:id>")
+def get_tarefa(id):
+
+    # Com o método get_or_404(), se a tarefa não existir, uma resposta com status 404 é lançada automaticamente
+    tarefa = Tarefa.query.get_or_404(id).toDict()
+    
+    return jsonify(tarefa),200
+
+# Rota que cria uma nova tarefa e retorna a mesma em formato json
+@tarefa_bp.route("/tarefas",methods=["POST"])
+def create_tarefa():
+
+    dados = request.get_json()
+    
+    titulo    = dados["titulo"]
+    descricao = dados["descricao"]
+    data      = dados["data"]
+
+    if verificaPreenchimento([titulo,descricao,data]) == False:
+        return jsonify({"erro" : "Todas as informações da tarefa são obrigatórios."}), 400
+
+    try:
+        tarefa = Tarefa(titulo,descricao,data)
+    except:
+        return jsonify({"erro" : "Falha ao criar tarefa: dados inválidos."}), 400
+
+    db.session.add(tarefa)
+    db.session.commit()
         
-    return render_template("index.html",filtro=filtro)
+    return jsonify(tarefa.toDict()), 201
 
-# Rota para busca de tarefas
-@tarefa_bp.route("/busca")
-def busca():
+# Rota que altera uma tarefa e retorna a mesma em formato json
+@tarefa_bp.route("/tarefas/<int:id>",methods=["PUT"])
+def update_tarefa(id):
 
-    filtro = request.args.get("filtro")
-
-    if int(filtro) not in [-1,0,1]:
-        return redirect("/")
+    dados = request.get_json()
     
-    lista = []
+    titulo    = dados["titulo"]
+    descricao = dados["descricao"]
+    data      = dados["data"]
 
-    if filtro:
-        if filtro == "-1":
-            tarefas = Tarefa.query.order_by(Tarefa.data)
-        else:
-            tarefas = Tarefa.query.filter_by(concluida = filtro).order_by(Tarefa.data)
+    if verificaPreenchimento([titulo,descricao,data]) == False:
+        return jsonify({"erro" : "Todas as informações da tarefa são obrigatórios."}), 400
 
-        for tarefa in tarefas:
-            lista.append(tarefa.toDict())
-    
-    else:
-        return redirect("/")
-    
-    return jsonify(lista)
+    tarefa = Tarefa.query.get_or_404(id)
+    try:
+        tarefa.update(titulo,descricao,data)
+    except:
+        return jsonify({"erro" : "Falha ao atualizar tarefa: dados inválidos."}), 400
 
-@tarefa_bp.route("/criarTarefa",methods=["GET","POST"])
-def criarTarefa():
-
-    if request.method == "POST":
-
-        t       = request.form.get("titulo")
-        desc    = request.form.get("descricao")
-        dt      = request.form.get("data")
-
-        tarefa = Tarefa(t,desc,dt)
-        db.session.add(tarefa)
-        db.session.commit()
+    db.session.commit()
         
-        return redirect("/")
+    return jsonify(tarefa.toDict()), 200
+
+# Rota que deleta uma tarefa e retorna uma mensagem de confirmação
+@tarefa_bp.route("/tarefas/<int:id>",methods=["DELETE"])
+def delete_tarefa(id):
     
-    else:
-
-        return render_template("criarTarefa.html")
+    tarefa = Tarefa.query.get_or_404(id)
     
-@tarefa_bp.route("/alterarTarefa",methods=["GET","POST"])
-def alterarTarefa():
-
-    if request.method == "POST":
-
-        id      = int(request.form.get("id"))
-        t       = request.form.get("titulo")
-        desc    = request.form.get("descricao")
-        dt      = request.form.get("data")
-
-        tarefa = Tarefa.query.get(id)
-
-        if tarefa == None:
-            return redirect("/")
-
-        tarefa.update(t,desc,dt)
-        
-        db.session.commit()
-        
-        return redirect("/")
-    
-    else:
-        id = int(request.args.get("id"))
-        tarefa = Tarefa.query.get(id)
-        if tarefa == None:
-            return redirect("/")
-        
-        #tarefa.data = converteData(tarefa.data)
-        return render_template("alterarTarefa.html",tarefa = tarefa)
-    
-@tarefa_bp.route("/excluirTarefa",methods=["GET","POST"])
-def excluirTarefa():
-    id = int(request.args.get("id"))
-    tarefa = Tarefa.query.get(id)
-    if tarefa == None:
-        return redirect("/")
     db.session.delete(tarefa)
     db.session.commit()
-    return redirect("/?filtro="+request.args.get("filtro"))
 
-@tarefa_bp.route("/concluirTarefa",methods=["GET","POST"])
-def concluirTarefa():
-    id = int(request.args.get("id"))
-    tarefa = Tarefa.query.get(id)
-    if tarefa == None:
-        return redirect("/")
-    tarefa.concluida = True
+    return jsonify({"mensagem":"Tarefa deletada."}), 200
+
+# Rota que conclui uma tarefa e retorna a mesma em formato json
+@tarefa_bp.route("/tarefas/<int:id>/concluir",methods=["PATCH"])
+def concluir_tarefa(id):
+    
+    tarefa = Tarefa.query.get_or_404(id)
+    tarefa.update_status()
     db.session.commit()
-    return redirect("/?filtro="+request.args.get("filtro"))
+
+    return jsonify(tarefa.toDict()), 200
+
+def verificaPreenchimento(lista):
+    for i in lista:
+        if i == "" or i == None:
+            return False
+    return True
