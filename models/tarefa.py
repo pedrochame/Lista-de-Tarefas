@@ -21,7 +21,7 @@ class Tarefa(db.Model):
         try:
             self.data = datetime.strptime(data,"%Y-%m-%d").date()
         except ValueError:
-            raise ValueError("A data deve estar no formato %Y-%m-%d")
+            raise ValueError("A data "+data+" deve estar no formato YYYY-MM-DD")
 
         self.concluida = False
     
@@ -37,7 +37,7 @@ class Tarefa(db.Model):
         try:
             self.data = datetime.strptime(data,"%Y-%m-%d").date()
         except ValueError:
-            raise ValueError("A data deve estar no formato %Y-%m-%d")
+            raise ValueError("A data "+data+" deve estar no formato YYYY-MM-DD")
 
     def update_status(self):
         self.concluida = not self.concluida
