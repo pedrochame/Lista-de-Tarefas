@@ -30,18 +30,18 @@ def get_tarefa(id):
 def create_tarefa():
 
     dados = request.get_json()
-    
+
+    if validaDadosRecebidos(dados) == False:
+        return jsonify({"erro" : "Todas as informações da tarefa são obrigatórias."}), 400
+
     titulo    = dados["titulo"]
     descricao = dados["descricao"]
     data      = dados["data"]
 
-    if verificaPreenchimento([titulo,descricao,data]) == False:
-        return jsonify({"erro" : "Todas as informações da tarefa são obrigatórios."}), 400
-
     try:
         tarefa = Tarefa(titulo,descricao,data)
-    except:
-        return jsonify({"erro" : "Falha ao criar tarefa: dados inválidos."}), 400
+    except ValueError as e:
+        return jsonify({ "erro" : str(e) }),400
 
     db.session.add(tarefa)
     db.session.commit()
@@ -53,19 +53,20 @@ def create_tarefa():
 def update_tarefa(id):
 
     dados = request.get_json()
+
+    if validaDadosRecebidos(dados) == False:
+        return jsonify({"erro" : "Todas as informações da tarefa são obrigatórias."}), 400
     
     titulo    = dados["titulo"]
     descricao = dados["descricao"]
     data      = dados["data"]
 
-    if verificaPreenchimento([titulo,descricao,data]) == False:
-        return jsonify({"erro" : "Todas as informações da tarefa são obrigatórios."}), 400
-
     tarefa = Tarefa.query.get_or_404(id)
+
     try:
         tarefa.update(titulo,descricao,data)
-    except:
-        return jsonify({"erro" : "Falha ao atualizar tarefa: dados inválidos."}), 400
+    except ValueError as e:
+        return jsonify({"erro" : str(e)}), 400
 
     db.session.commit()
         
@@ -92,8 +93,9 @@ def concluir_tarefa(id):
 
     return jsonify(tarefa.toDict()), 200
 
-def verificaPreenchimento(lista):
-    for i in lista:
-        if i == "" or i == None:
+def validaDadosRecebidos(dic):
+    camposTarefa = ["titulo","descricao","data"]
+    for chave in camposTarefa:
+        if dic[chave] in ["",None]:
             return False
     return True

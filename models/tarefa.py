@@ -11,39 +11,36 @@ class Tarefa(db.Model):
 
     def __init__(self, titulo, descricao, data):
 
-        # Se o título tiver mais de 100 caracteres, uma exceção é lançada
-        if len(str(titulo))>100:
-            raise Exception
+        # O campo TÍTULO no banco de dados possui tamanho 100, então somente os 100 primeiros caracteres são incluídos
+        self.titulo = str(titulo)[0:100]
         
-        self.titulo = str(titulo)
         self.descricao = str(descricao)
 
 
         # Se a data não estiver no formato que o método de conversão para tipo Date espera, uma exceção é lançada
         try:
             self.data = datetime.strptime(data,"%Y-%m-%d").date()
-        except:
-            raise Exception
+        except ValueError:
+            raise ValueError("A data deve estar no formato %Y-%m-%d")
 
         self.concluida = False
     
     def update(self, titulo, descricao, data):
-        # Se o título tiver mais de 100 caracteres, uma exceção é lançada
-        if len(str(titulo))>100:
-            raise Exception
-        
-        self.titulo = str(titulo)
+
+        # O campo TÍTULO no banco de dados possui tamanho 100, então somente os 100 primeiros caracteres são incluídos
+        self.titulo = str(titulo)[0:100]
+
         self.descricao = str(descricao)
 
 
         # Se a data não estiver no formato que o método de conversão para tipo Date espera, uma exceção é lançada
         try:
             self.data = datetime.strptime(data,"%Y-%m-%d").date()
-        except:
-            raise Exception
+        except ValueError:
+            raise ValueError("A data deve estar no formato %Y-%m-%d")
 
     def update_status(self):
-        self.concluida = True
+        self.concluida = not self.concluida
 
 
     def toDict(self):
