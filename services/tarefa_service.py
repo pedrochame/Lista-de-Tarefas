@@ -3,11 +3,16 @@ from extensions import db
 
 #Função que valida se os dados recebidos em uma requisição estão com as chaves necessárias e seus respectivos valores preenchidos
 def validaDadosRecebidos(dic):
-    camposTarefa = ["titulo","descricao","data"]
-    for chave in camposTarefa:
-        if dic[chave] in ["",None]:
-            return False
-    return True
+
+    camposTarefa = {"titulo","descricao","data"}
+
+    if camposTarefa != dic.keys():
+        return False
+    
+    if all(valor not in ["",None] for valor in dic.values()):
+        return True
+    
+    return False
 
 # Função que retorna todos os registros no banco de dados e o status a ser respondido pela rota
 def lista_tarefas():
